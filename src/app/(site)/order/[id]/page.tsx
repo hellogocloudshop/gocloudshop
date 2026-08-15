@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPublicOrderStatus } from "@/lib/data/orders";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { formatDate, formatPrice } from "@/lib/utils";
+import { cn, formatDate, formatPrice } from "@/lib/utils";
 
 // Never indexed — every URL here is a specific customer's private order.
 export const metadata: Metadata = {
@@ -14,6 +14,11 @@ export const metadata: Metadata = {
 interface StatusCopy {
   title: string;
   description: string;
+  /** Only set for failed/expired payments — lets the customer retry
+   *  without a dead end. Points at the catalog rather than the specific
+   *  product, since this page doesn't have the product's slug/category on
+   *  hand (only its name snapshot). */
+  retryHref?: string;
 }
 
 /**
@@ -32,7 +37,8 @@ function getStatusCopy(orderStatus: string, paymentStatus: string, cryptoStatus:
   if (cryptoStatus === "failed" || cryptoStatus === "expired" || orderStatus === "cancelled") {
     return {
       title: "Payment was not completed.",
-      description: "This payment failed or expired before it was confirmed. You can return to the product page to try again, or contact support.",
+      description: "This payment failed or expired before it was confirmed. You can browse the catalog to try again, or contact support.",
+      retryHref: "/all-products",
     };
   }
   if (paymentStatus === "partially_paid") {
@@ -78,6 +84,12 @@ export default async function OrderStatusPage({ params }: { params: Promise<{ id
                 </dd>
               </div>
             )}
+            {order.quantity > 1 && (
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-ink-muted">Quantity</dt>
+                <dd className="text-ink">{order.quantity}</dd>
+              </div>
+            )}
             {order.price !== null && (
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-ink-muted">Amount</dt>
@@ -109,9 +121,16 @@ export default async function OrderStatusPage({ params }: { params: Promise<{ id
             </div>
           )}
 
-          <Link href="/contact" className="btn-secondary mt-6 w-full justify-center">
-            Contact Support
-          </Link>
+          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+            {copy.retryHref && (
+              <Link href={copy.retryHref} className="btn-primary w-full justify-center sm:flex-1">
+                Browse Products
+              </Link>
+            )}
+            <Link href="/contact" className={cn("btn-secondary w-full justify-center", copy.retryHref && "sm:flex-1")}>
+              Contact Support
+            </Link>
+          </div>
         </div>
       </div>
     </div>

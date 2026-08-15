@@ -1,13 +1,13 @@
-import { Compass, GitCompareArrows, MousePointerClick, MessageCircle, CheckCircle2, CreditCard, PackageCheck } from "lucide-react";
+import { Compass, GitCompareArrows, MousePointerClick, ShoppingCart, CreditCard, CheckCircle2, PackageCheck } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 const steps = [
   { icon: Compass, title: "Explore", description: "Browse Cloud, AI, Credits, or Compute products across every supported provider." },
   { icon: GitCompareArrows, title: "Compare", description: "Compare prices and specifications side by side before making your decision." },
   { icon: MousePointerClick, title: "Choose", description: "Select the product and variation that matches your project requirements." },
-  { icon: MessageCircle, title: "Contact", description: "Use the \"Order via Telegram\" button to reach our support team directly." },
-  { icon: CheckCircle2, title: "Confirm", description: "We confirm availability and order details with you personally." },
-  { icon: CreditCard, title: "Complete", description: "Complete the payment process securely with our team." },
+  { icon: ShoppingCart, title: "Buy Now", description: "Click \"Buy Now\" and review your order at checkout." },
+  { icon: CreditCard, title: "Pay Securely", description: "Enter your details and complete payment online with cryptocurrency." },
+  { icon: CheckCircle2, title: "Confirm", description: "Your payment is verified automatically — no waiting on a reply." },
   { icon: PackageCheck, title: "Receive", description: "Receive your delivery and access information—usually within minutes." },
 ];
 

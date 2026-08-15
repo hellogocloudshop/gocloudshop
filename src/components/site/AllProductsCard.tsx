@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import type { SellableItem } from "@/lib/data/allProducts";
-import { formatPrice, productHref } from "@/lib/utils";
+import { cn, formatPrice, productHref } from "@/lib/utils";
 import { ProductBadge, AvailabilityBadge } from "@/components/ui/Badge";
 import { ProviderLogo } from "@/components/ui/SmartImage";
-import { TelegramOrderButton } from "./TelegramOrderButton";
+import { BuyNowButton } from "./BuyNowButton";
 
 /**
  * One card per purchasable variation (or per standalone product with no
@@ -15,9 +15,10 @@ import { TelegramOrderButton } from "./TelegramOrderButton";
  * route (spec: primary visible CTA must be Buy, a details link may remain
  * internally accessible).
  */
-export function AllProductsCard({ item, telegramUsername }: { item: SellableItem; telegramUsername: string }) {
+export function AllProductsCard({ item }: { item: SellableItem }) {
   const { product, variation, displayName, price, currency, availability, badge, features } = item;
   const detailsHref = productHref(product);
+  const isBuyable = price !== null && availability !== "out_of_stock";
 
   return (
     <div className="card-surface card-surface-hover flex flex-col p-5">
@@ -59,17 +60,13 @@ export function AllProductsCard({ item, telegramUsername }: { item: SellableItem
           <p className="text-lg font-bold text-ink">{price !== null ? formatPrice(price, currency) : "Contact us"}</p>
           <AvailabilityBadge status={availability} />
         </div>
-        <TelegramOrderButton
-          telegramUsername={telegramUsername}
-          productId={product.id}
-          productName={product.name}
-          variationId={variation?.id}
-          variationName={variation?.name}
-          price={price}
-          currency={currency}
-          label="Buy"
-          className="!px-4 !py-2 shrink-0"
-        />
+        {isBuyable ? (
+          <BuyNowButton productId={product.id} variationId={variation?.id} label="Buy" className="!px-4 !py-2 shrink-0" />
+        ) : (
+          <Link href="/contact" className={cn("btn-secondary shrink-0", "!px-4 !py-2")}>
+            Contact
+          </Link>
+        )}
       </div>
     </div>
   );

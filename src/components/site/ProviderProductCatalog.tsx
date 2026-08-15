@@ -1,8 +1,9 @@
+import Link from "next/link";
 import type { SellableItem } from "@/lib/data/allProducts";
 import { cn, formatPrice } from "@/lib/utils";
 import { AvailabilityBadge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { TelegramOrderButton } from "./TelegramOrderButton";
+import { BuyNowButton } from "./BuyNowButton";
 
 /** Real spec text only — features first, falling back to specifications
  *  key/value pairs. Never fabricated; returns null when neither exists. */
@@ -18,18 +19,16 @@ function configurationLine(item: SellableItem): string | null {
  * ONE unified catalog section for a provider's account page — every
  * purchasable variation/account tier as a compact row inside a single
  * bordered container, separated by dividers, rather than a grid of
- * individual cards. Each row's Buy button fires the exact same dynamic
- * Telegram order flow used everywhere else in the app.
+ * individual cards. Each row's Buy Now button takes the customer to the
+ * same /checkout flow used everywhere else in the app.
  */
 export function ProviderProductCatalog({
   items,
-  telegramUsername,
   title,
   emptyDescription,
   tone = "light",
 }: {
   items: SellableItem[];
-  telegramUsername: string;
   title: string;
   emptyDescription: string;
   tone?: "light" | "dark";
@@ -93,17 +92,18 @@ export function ProviderProductCatalog({
                   </div>
 
                   <div className="sm:w-32 sm:text-right">
-                    <TelegramOrderButton
-                      telegramUsername={telegramUsername}
-                      productId={item.product.id}
-                      productName={item.product.name}
-                      variationId={item.variation?.id}
-                      variationName={item.variation?.name}
-                      price={item.price}
-                      currency={item.currency}
-                      label="Buy Now"
-                      className="w-full justify-center !px-4 !py-2 text-sm sm:w-auto"
-                    />
+                    {item.price !== null && item.availability !== "out_of_stock" ? (
+                      <BuyNowButton
+                        productId={item.product.id}
+                        variationId={item.variation?.id}
+                        label="Buy Now"
+                        className="w-full justify-center !px-4 !py-2 text-sm sm:w-auto"
+                      />
+                    ) : (
+                      <Link href="/contact" className="btn-secondary w-full justify-center !px-4 !py-2 text-sm sm:w-auto">
+                        Contact
+                      </Link>
+                    )}
                   </div>
                 </div>
               );

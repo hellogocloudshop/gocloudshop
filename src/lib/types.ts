@@ -254,6 +254,10 @@ export interface Order {
   variation_name_snapshot: string | null;
   price_snapshot: number | null;
   currency: string;
+  /** Units of the same product/variation (see migration 0008). Always 1 for
+   *  the existing Telegram-lead flow; price_snapshot is the total (unit
+   *  price x quantity) for checkout/NOWPayments orders. */
+  quantity: number;
   order_status: OrderStatus;
   payment_status: PaymentStatus;
   notes: string | null;

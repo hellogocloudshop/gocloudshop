@@ -39,7 +39,11 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               <dd className="text-ink">{order.variation_name_snapshot ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-ink-muted">Price</dt>
+              <dt className="text-ink-muted">Quantity</dt>
+              <dd className="text-ink">{order.quantity}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Price (total)</dt>
               <dd className="text-ink">{order.price_snapshot !== null ? formatPrice(order.price_snapshot, order.currency) : "—"}</dd>
             </div>
           </dl>

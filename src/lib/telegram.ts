@@ -2,10 +2,14 @@ import type { Product, ProductVariation } from "./types";
 import { formatPrice } from "./utils";
 
 /**
- * Every "Order via Telegram" button in the app must build its link through
- * this function so the message always reflects the real, currently-selected
- * product/variation/price. Never hard-code a static Telegram message when
- * product information is available (spec requirement).
+ * Every remaining "Order via Telegram" button (Stock Updates — see
+ * StockUpdateCard, which isn't tied to a real catalog product/price row —
+ * and general support contact) must build its link through this function so
+ * the message always reflects the real, currently-selected product/
+ * variation/price. Never hard-code a static Telegram message when product
+ * information is available (spec requirement). The main catalog checkout
+ * flow uses NOWPayments instead — see /checkout and
+ * /api/nowpayments/create-payment.
  *
  * The Telegram handle itself is read from site_settings.telegram_username
  * (admin-editable, see Settings) with NEXT_PUBLIC_TELEGRAM_USERNAME as a

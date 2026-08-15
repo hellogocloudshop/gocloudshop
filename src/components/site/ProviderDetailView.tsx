@@ -88,7 +88,6 @@ export async function ProviderDetailView({ provider }: { provider: Provider }) {
   const catalog = (
     <ProviderProductCatalog
       items={items}
-      telegramUsername={settings.telegram_username}
       title={`Available ${displayName} Accounts`}
       emptyDescription={`${provider.name} has no active products right now — check back soon.`}
       tone={landing ? "dark" : "light"}

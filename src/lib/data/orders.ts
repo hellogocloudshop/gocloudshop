@@ -61,6 +61,7 @@ export interface PublicOrderStatus {
   variationName: string | null;
   price: number | null;
   currency: string;
+  quantity: number;
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
   cryptoPaymentStatus: string | null;
@@ -89,7 +90,7 @@ export async function getPublicOrderStatus(id: string): Promise<PublicOrderStatu
   const { data } = await admin
     .from("orders")
     .select(
-      "id, product_name_snapshot, variation_name_snapshot, price_snapshot, currency, order_status, payment_status, crypto_payment_status, pay_currency, pay_amount, pay_address, paid_at, created_at"
+      "id, product_name_snapshot, variation_name_snapshot, price_snapshot, currency, quantity, order_status, payment_status, crypto_payment_status, pay_currency, pay_amount, pay_address, paid_at, created_at"
     )
     .eq("id", id)
     .maybeSingle();
@@ -101,6 +102,7 @@ export async function getPublicOrderStatus(id: string): Promise<PublicOrderStatu
     variationName: data.variation_name_snapshot,
     price: data.price_snapshot,
     currency: data.currency,
+    quantity: data.quantity ?? 1,
     orderStatus: data.order_status,
     paymentStatus: data.payment_status,
     cryptoPaymentStatus: data.crypto_payment_status,
