@@ -1,0 +1,320 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  /* GoCloudShop — premium dark cloud/AI marketplace palette. Dark navy is
+     the site's one true brand background (not OS-dependent) — the same
+     approach most premium cloud/SaaS marketplaces take, so the brand looks
+     identical for every visitor. A `[data-theme="light"]` variant is kept
+     below as an explicit opt-in escape hatch (no UI toggle currently wired
+     to it), so the capability isn't removed, just not the default anymore. */
+  --color-bg: #0b1220;
+  --color-bg-subtle: #0f172a;
+  --color-surface: #0b1220;
+  --color-card: #111827;
+  --color-ink: #f8fafc;
+  --color-ink-muted: #94a3b8;
+  --color-line: rgb(255 255 255 / 0.09);
+
+  /* Deepest layer — used by forced-dark hero/AI panels (.surface-dark) for a
+     subtle depth cue against the slightly lighter --color-bg. */
+  --color-primary-dark: #050b18;
+  --color-deep-blue: #0b1330;
+  --color-accent-blue: #3b82f6;
+  --color-secondary: #6366f1;
+  --color-violet: #8b5cf6;
+  --color-sky-accent: #06b6d4;
+
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 10px 24px -12px rgb(0 0 0 / 0.55);
+  --shadow-card-hover: 0 1px 0 0 rgb(255 255 255 / 0.06) inset, 0 24px 48px -16px rgb(2 6 23 / 0.7),
+    0 0 0 1px rgb(59 130 246 / 0.25);
+  --shadow-elevated: 0 32px 80px -20px rgb(2 6 23 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.06) inset;
+  --shadow-glow-blue: 0 0 0 1px rgb(59 130 246 / 0.4), 0 8px 28px -6px rgb(59 130 246 / 0.5);
+}
+
+/* Explicit opt-in light theme — not currently exposed via any UI toggle,
+   kept as a capability rather than removed outright. */
+:root[data-theme="light"] {
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-ink: #0b1220;
+  --color-ink-muted: #55617a;
+  --color-line: rgb(15 23 42 / 0.09);
+
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.6) inset, 0 1px 2px 0 rgb(15 23 42 / 0.04),
+    0 8px 20px -10px rgb(15 23 42 / 0.10);
+  --shadow-card-hover: 0 1px 0 0 rgb(255 255 255 / 0.7) inset, 0 20px 40px -16px rgb(15 23 42 / 0.16),
+    0 0 0 1px rgb(37 99 235 / 0.14);
+  --shadow-elevated: 0 32px 80px -24px rgb(15 23 42 / 0.28), 0 0 0 1px rgb(15 23 42 / 0.06);
+  --shadow-glow-blue: 0 0 0 1px rgb(37 99 235 / 0.35), 0 8px 28px -6px rgb(37 99 235 / 0.45);
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-bg-subtle: var(--color-bg-subtle);
+  --color-surface: var(--color-surface);
+  --color-card: var(--color-card);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-line: var(--color-line);
+
+  --color-primary-dark: var(--color-primary-dark);
+  --color-deep-blue: var(--color-deep-blue);
+  --color-accent-blue: var(--color-accent-blue);
+  --color-secondary: var(--color-secondary);
+  --color-violet: var(--color-violet);
+  --color-sky-accent: var(--color-sky-accent);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.5s ease-out both;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 11s ease-in-out infinite;
+  --animate-glow: glow-pulse 4s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+    50% {
+      transform: translateY(-14px) translateX(6px);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--color-sky-accent);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.14);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.22);
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgb(15 23 42 / 0.15);
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgb(15 23 42 / 0.25);
+}
+
+/* Reusable primitives shared across the site */
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card-surface {
+    @apply relative rounded-2xl border border-line bg-card shadow-[var(--shadow-card)] transition-all duration-300;
+  }
+
+  .card-surface-hover {
+    @apply hover:-translate-y-1 hover:border-accent-blue/40 hover:shadow-[var(--shadow-card-hover)];
+  }
+
+  .card-premium {
+    @apply relative rounded-[20px] p-[1px] transition-all duration-300;
+    background: linear-gradient(135deg, rgb(59 130 246 / 0.55), rgb(99 102 241 / 0.4) 45%, rgb(6 182 212 / 0.45));
+  }
+
+  .card-premium-inner {
+    @apply relative h-full rounded-[19px] bg-card;
+  }
+
+  .glass {
+    @apply border border-line bg-white/[0.04] backdrop-blur-xl;
+  }
+  :root[data-theme="light"] .glass {
+    @apply bg-white/70;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-secondary bg-[length:160%_100%] bg-[position:0%_0%] px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-glow-blue)] transition-all duration-300 hover:bg-[position:100%_0%] hover:shadow-[0_0_0_1px_rgb(59_130_246_/_0.5),0_12px_32px_-6px_rgb(59_130_246_/_0.5)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-blue disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:border-accent-blue/50 hover:bg-white/[0.06] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-blue;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-ink-muted transition-colors duration-200 hover:bg-white/[0.06] hover:text-ink;
+  }
+
+  .section-eyebrow {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-sky-accent;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .icon-tile {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-[0_8px_20px_-6px_rgb(59_130_246_/_0.5)] ring-1 ring-white/10 transition-transform duration-300;
+  }
+  .icon-tile-a {
+    @apply bg-gradient-to-br from-accent-blue to-secondary;
+  }
+  .icon-tile-b {
+    @apply bg-gradient-to-br from-sky-accent to-accent-blue;
+  }
+  .icon-tile-c {
+    @apply bg-gradient-to-br from-secondary to-violet;
+  }
+  .icon-tile-d {
+    @apply bg-gradient-to-br from-accent-blue via-secondary to-violet;
+  }
+
+  /* Forced-dark panels (Hero, AI Cloud, Cloud-Service, provider landing
+     pages) — a touch deeper than the site's regular --color-bg for subtle
+     depth/rhythm, now that dark is the site's one background throughout. */
+  .surface-dark {
+    @apply relative overflow-hidden text-white;
+    background: var(--color-primary-dark);
+  }
+
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .text-gradient-sky {
+    @apply bg-gradient-to-r from-sky-accent to-accent-blue bg-clip-text text-transparent;
+  }
+  .text-gradient-premium {
+    @apply bg-gradient-to-r from-white via-sky-accent to-secondary bg-clip-text text-transparent;
+  }
+  .text-gradient-violet {
+    @apply bg-gradient-to-r from-accent-blue to-violet bg-clip-text text-transparent;
+  }
+
+  /* Section mesh backgrounds: soft radial washes for subtle rhythm between
+     otherwise-flat dark sections. */
+  .section-mesh-blue {
+    background-color: var(--color-bg-subtle);
+    background-image: radial-gradient(650px circle at 12% 8%, rgb(59 130 246 / 0.14), transparent 58%),
+      radial-gradient(550px circle at 90% 85%, rgb(99 102 241 / 0.1), transparent 55%);
+  }
+  .section-mesh-violet {
+    background-color: var(--color-bg-subtle);
+    background-image: radial-gradient(650px circle at 85% 0%, rgb(139 92 246 / 0.14), transparent 55%),
+      radial-gradient(500px circle at 8% 95%, rgb(6 182 212 / 0.1), transparent 55%);
+  }
+  .section-divider {
+    @apply relative border-y border-line;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-emerald-400/15 text-emerald-300 ring-1 ring-emerald-400/20;
+  }
+  .badge-warning {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/20;
+  }
+  .badge-danger {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-red-400/15 text-red-300 ring-1 ring-red-400/20;
+  }
+  .badge-info {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-accent-blue/15 text-sky-300 ring-1 ring-accent-blue/25;
+  }
+  .badge-violet {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-violet/15 text-violet-300 ring-1 ring-violet/25;
+  }
+  .badge-neutral {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white/[0.06] text-ink-muted ring-1 ring-line;
+  }
+  :root[data-theme="light"] .badge-success {
+    @apply bg-emerald-500/10 text-emerald-700 ring-emerald-500/20;
+  }
+  :root[data-theme="light"] .badge-warning {
+    @apply bg-amber-500/10 text-amber-700 ring-amber-500/20;
+  }
+  :root[data-theme="light"] .badge-danger {
+    @apply bg-red-500/10 text-red-700 ring-red-500/20;
+  }
+  :root[data-theme="light"] .badge-info {
+    @apply bg-accent-blue/10 text-accent-blue ring-accent-blue/20;
+  }
+  :root[data-theme="light"] .badge-violet {
+    @apply bg-violet/10 text-violet ring-violet/20;
+  }
+  :root[data-theme="light"] .badge-neutral {
+    @apply bg-bg-subtle text-ink-muted ring-line;
+  }
+
+  .alert-danger {
+    @apply rounded-lg border border-red-400/20 bg-red-400/[0.08] px-4 py-3 text-sm text-red-300;
+  }
+  .alert-warning {
+    @apply rounded-lg border border-amber-400/20 bg-amber-400/[0.08] px-3 py-2 text-sm text-amber-300;
+  }
+  .alert-success {
+    @apply rounded-lg border border-emerald-400/20 bg-emerald-400/[0.08] px-3 py-2 text-sm text-emerald-300;
+  }
+  :root[data-theme="light"] .alert-danger {
+    @apply border-red-500/20 bg-red-500/5 text-red-700;
+  }
+  :root[data-theme="light"] .alert-warning {
+    @apply border-amber-500/20 bg-amber-500/5 text-amber-700;
+  }
+  :root[data-theme="light"] .alert-success {
+    @apply border-emerald-500/20 bg-emerald-500/5 text-emerald-700;
+  }
+}
