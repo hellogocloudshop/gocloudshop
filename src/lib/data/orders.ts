@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Order, OrderStatus } from "@/lib/types";
+import { createAdminClient } from "@/lib/supabase/admin";
+import type { Order, OrderStatus, PaymentStatus } from "@/lib/types";
 
 /**
  * Orders are staff-only reads (see RLS policy orders_staff_select), so this
@@ -52,4 +53,61 @@ export async function getOrderCounts(): Promise<Record<OrderStatus, number>> {
     empty[row.order_status] += 1;
   }
   return empty;
+}
+
+export interface PublicOrderStatus {
+  id: string;
+  productName: string | null;
+  variationName: string | null;
+  price: number | null;
+  currency: string;
+  orderStatus: OrderStatus;
+  paymentStatus: PaymentStatus;
+  cryptoPaymentStatus: string | null;
+  payCurrency: string | null;
+  payAmount: number | null;
+  payAddress: string | null;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+/**
+ * Public order-status lookup by id, for the customer-facing /order/[id]
+ * page after a NOWPayments checkout. `orders` is staff-only readable via
+ * RLS (see 0002_rls.sql — there are no customer accounts on this storefront
+ * to scope a policy to), so this deliberately uses the service-role admin
+ * client to read a single row by its own unguessable random id — the same
+ * "possession of the link is the authorization" model used by most
+ * anonymous-checkout order-status pages. Only returns the safe subset of
+ * fields a customer should see — never customer_name/contact/notes/
+ * referrer/ipn_payload, which stay staff-only (see admin/orders).
+ */
+export async function getPublicOrderStatus(id: string): Promise<PublicOrderStatus | null> {
+  const admin = createAdminClient();
+  if (!admin) return null;
+
+  const { data } = await admin
+    .from("orders")
+    .select(
+      "id, product_name_snapshot, variation_name_snapshot, price_snapshot, currency, order_status, payment_status, crypto_payment_status, pay_currency, pay_amount, pay_address, paid_at, created_at"
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    productName: data.product_name_snapshot,
+    variationName: data.variation_name_snapshot,
+    price: data.price_snapshot,
+    currency: data.currency,
+    orderStatus: data.order_status,
+    paymentStatus: data.payment_status,
+    cryptoPaymentStatus: data.crypto_payment_status,
+    payCurrency: data.pay_currency,
+    payAmount: data.pay_amount,
+    payAddress: data.pay_address,
+    paidAt: data.paid_at,
+    createdAt: data.created_at,
+  };
 }

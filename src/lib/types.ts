@@ -258,6 +258,25 @@ export interface Order {
   payment_status: PaymentStatus;
   notes: string | null;
   referrer: string | null;
+  /** NOWPayments crypto-payment fields (see migration 0007) — null for the
+   *  existing Telegram-lead flow, which doesn't set a payment_provider. */
+  payment_provider: string | null;
+  nowpayments_payment_id: string | null;
+  nowpayments_order_id: string | null;
+  pay_currency: string | null;
+  pay_amount: number | null;
+  pay_address: string | null;
+  outcome_amount: number | null;
+  outcome_currency: string | null;
+  /** Raw NOWPayments payment_status string — see mapPaymentStatus() in
+   *  lib/nowpayments.ts for how this maps into payment_status above. */
+  crypto_payment_status: string | null;
+  /** Most recent verified IPN payload, for audit/debugging only. */
+  ipn_payload: Record<string, unknown> | null;
+  paid_at: string | null;
+  /** Set manually by staff once the order has actually been delivered — no
+   *  automated fulfillment exists in this project. */
+  fulfilled_at: string | null;
   created_at: string;
   updated_at: string;
 }

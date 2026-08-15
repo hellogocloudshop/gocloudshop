@@ -8,6 +8,7 @@ import { AvailabilityBadge, ProductBadge } from "@/components/ui/Badge";
 import { SpecificationTable } from "./SpecificationTable";
 import { AIProductSpecs } from "./AIProductSpecs";
 import { TelegramOrderButton } from "./TelegramOrderButton";
+import { CryptoPaymentButton } from "./CryptoPaymentButton";
 
 const SEARCHABLE_THRESHOLD = 7;
 
@@ -154,16 +155,25 @@ export function VariationSelector({
           )}
         </div>
 
-        <TelegramOrderButton
-          telegramUsername={telegramUsername}
-          productId={product.id}
-          productName={product.name}
-          variationId={selected?.id}
-          variationName={selected?.name}
-          price={price}
-          currency={currency}
-          className="mt-5 w-full justify-center"
-        />
+        <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
+          <TelegramOrderButton
+            telegramUsername={telegramUsername}
+            productId={product.id}
+            productName={product.name}
+            variationId={selected?.id}
+            variationName={selected?.name}
+            price={price}
+            currency={currency}
+            className="w-full justify-center sm:flex-1"
+          />
+          {price !== null && (
+            <CryptoPaymentButton
+              productId={product.id}
+              variationId={selected?.id}
+              className="w-full justify-center sm:flex-1"
+            />
+          )}
+        </div>
       </div>
 
       {features.length > 0 && (

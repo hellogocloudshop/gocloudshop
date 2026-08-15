@@ -46,6 +46,46 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </div>
       </div>
 
+      {order.payment_provider === "nowpayments" && (
+        <div className="mt-6 card-surface p-6">
+          <h2 className="font-semibold text-ink">Crypto Payment (NOWPayments)</h2>
+          <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-ink-muted">NOWPayments Payment ID</dt>
+              <dd className="break-all font-mono text-xs text-ink">{order.nowpayments_payment_id ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Raw Payment Status</dt>
+              <dd className="text-ink">{order.crypto_payment_status ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Pay Currency</dt>
+              <dd className="uppercase text-ink">{order.pay_currency ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Pay Amount</dt>
+              <dd className="text-ink">{order.pay_amount ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Pay Address</dt>
+              <dd className="break-all font-mono text-xs text-ink">{order.pay_address ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-muted">Paid At</dt>
+              <dd className="text-ink">{order.paid_at ? formatDate(order.paid_at) : "—"}</dd>
+            </div>
+            {(order.outcome_amount !== null || order.outcome_currency !== null) && (
+              <div>
+                <dt className="text-ink-muted">Outcome</dt>
+                <dd className="text-ink">
+                  {order.outcome_amount ?? "—"} {order.outcome_currency?.toUpperCase() ?? ""}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
+
       <div className="mt-6 card-surface p-6">
         <h2 className="font-semibold text-ink">Status</h2>
         <div className="mt-4">

@@ -180,6 +180,28 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return (data as Product) ?? null;
 }
 
+/**
+ * Looked up by id (not slug) — used server-side by the NOWPayments
+ * create-payment route, which only ever receives a product id from the
+ * client and must independently re-derive the real price/currency from the
+ * database, never trusting anything the client sends.
+ */
+export async function getProductById(id: string): Promise<Product | null> {
+  const supabase = await createClient();
+
+  if (!supabase) {
+    const product = mockProducts.find((p) => p.id === id && p.is_active);
+    return product ? attachRelations(product) : null;
+  }
+
+  const { data } = await supabase
+    .from("products")
+    .select("*, provider:providers(*), category:categories(*), variations:product_variations(*)")
+    .eq("id", id)
+    .maybeSingle();
+  return (data as Product) ?? null;
+}
+
 export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
   const { products } = await getProducts({ isFeatured: true, pageSize: limit, sort: "recommended" });
   return products;
