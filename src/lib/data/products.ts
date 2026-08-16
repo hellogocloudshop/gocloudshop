@@ -173,6 +173,10 @@ export async function getProducts(
 
   const { data, count, error } = await query;
   logSupabaseError("getProducts", error);
+  // Temporary diagnostic (safe: counts only, no row data) — distinguishes
+  // "Supabase query failed" (see the logSupabaseError line above, if any)
+  // from "query succeeded but returned zero rows".
+  console.log(`[supabase] getProducts: rows=${data?.length ?? 0} count=${count ?? "null"} filters=${JSON.stringify(filters)}`);
   return { products: (data as Product[]) ?? [], total: count ?? 0 };
 }
 

@@ -19,6 +19,8 @@ export async function getProviders(options?: { activeOnly?: boolean }): Promise<
   if (activeOnly) query = query.eq("is_active", true);
   const { data, error } = await query;
   logSupabaseError("getProviders", error);
+  // Temporary diagnostic (safe: count only, no row data).
+  console.log(`[supabase] getProviders: rows=${data?.length ?? 0} activeOnly=${activeOnly}`);
   return (data as Provider[]) ?? [];
 }
 
