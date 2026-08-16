@@ -72,10 +72,21 @@ async function nowpaymentsFetch<T>(path: string, init?: RequestInit): Promise<T>
   }
 
   if (!res.ok) {
+    const bodyObj = body && typeof body === "object" ? (body as Record<string, unknown>) : null;
+    const code = bodyObj && typeof bodyObj.code === "string" ? bodyObj.code : undefined;
     const message =
-      body && typeof body === "object" && "message" in body && typeof (body as { message?: unknown }).message === "string"
-        ? (body as { message: string }).message
-        : `NOWPayments request failed with status ${res.status}.`;
+      bodyObj && typeof bodyObj.message === "string" ? bodyObj.message : `NOWPayments request failed with status ${res.status}.`;
+
+    // NOWPayments' documented error code for a missing/invalid/revoked API
+    // key. Flagging this distinctly (server-side log only, never in the
+    // thrown message shown to a client) turns a permanent misconfiguration
+    // into an unambiguous, greppable log line instead of it looking like a
+    // generic/transient failure — this is deliberately the first thing to
+    // rule out before suspecting the currency-lookup logic itself.
+    if (res.status === 403 && code === "INVALID_API_KEY") {
+      throw new NowPaymentsError("NOWPayments rejected the configured NOWPAYMENTS_API_KEY (missing, invalid, or revoked).", res.status);
+    }
+
     throw new NowPaymentsError(message, res.status);
   }
 
@@ -136,13 +147,24 @@ export async function getNowPaymentStatus(paymentId: string): Promise<NowPayment
   return data;
 }
 
-/** The set of pay_currency tickers NOWPayments currently supports for this
- *  merchant account — used to validate any customer-selected currency
- *  before it's ever sent to /v1/payment. Lowercase, matching NOWPayments'
- *  own ticker casing. */
+/** The set of pay_currency tickers this merchant's NOWPayments account has
+ *  actually enabled (NOWPayments Dashboard -> Store Settings -> accepted
+ *  currencies) — used to validate any customer-selected currency before
+ *  it's ever sent to /v1/payment.
+ *
+ *  Deliberately calls /v1/merchant/coins rather than the platform-wide
+ *  /v1/currencies list: NOWPayments supports hundreds of coins overall, but
+ *  a given merchant account only has a subset enabled, and only those will
+ *  actually succeed at payment-creation time — validating against the full
+ *  list could let a customer pick a currency that passes this check but
+ *  then fails when /v1/payment is called. Lowercase, matching NOWPayments'
+ *  own ticker casing (e.g. "usdttrc20"). */
 export async function getAvailableCurrencies(): Promise<string[]> {
-  const data = await nowpaymentsFetch<{ currencies: string[] }>("/currencies", { method: "GET" });
-  return (data.currencies ?? []).map((c) => c.toLowerCase());
+  const data = await nowpaymentsFetch<{ selectedCurrencies?: string[]; currencies?: string[] }>("/merchant/coins", {
+    method: "GET",
+  });
+  const list = data.selectedCurrencies ?? data.currencies ?? [];
+  return list.map((c) => c.toLowerCase());
 }
 
 // ---------------------------------------------------------------------------
