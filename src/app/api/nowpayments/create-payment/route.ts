@@ -99,6 +99,16 @@ export async function POST(request: NextRequest) {
 
   const admin = createAdminClient();
   if (!admin) {
+    // createAdminClient() only returns null when NEXT_PUBLIC_SUPABASE_URL
+    // and/or SUPABASE_SERVICE_ROLE_KEY aren't set — this is a deployment
+    // configuration problem, not a NOWPayments issue. Log presence/absence
+    // only (never the values) so it's unambiguous in server logs which
+    // variable(s) are missing from this environment.
+    console.error(
+      "[nowpayments] order creation blocked: Supabase admin client unavailable.",
+      `NEXT_PUBLIC_SUPABASE_URL=${process.env.NEXT_PUBLIC_SUPABASE_URL ? "set" : "MISSING"}`,
+      `SUPABASE_SERVICE_ROLE_KEY=${process.env.SUPABASE_SERVICE_ROLE_KEY ? "set" : "MISSING"}`
+    );
     return NextResponse.json({ error: "Payments are not available yet — please contact support." }, { status: 503 });
   }
 
