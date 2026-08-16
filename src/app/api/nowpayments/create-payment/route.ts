@@ -8,8 +8,18 @@ import { createNowPayment, getAvailableCurrencies, NowPaymentsError } from "@/li
 export const runtime = "nodejs";
 
 const bodySchema = z.object({
-  productId: z.string().uuid("Invalid product."),
-  variationId: z.string().uuid("Invalid variation.").nullish(),
+  // Deliberately NOT z.string().uuid() — getProductById()/getVariationById()
+  // fall back to src/lib/mock-data.ts (non-UUID string ids, e.g.
+  // "p-aws-compute") whenever Supabase isn't connected yet, which is the
+  // exact cause of a previously-reported "Invalid product." error here: a
+  // real id was rejected by this schema before ever reaching the actual
+  // lookup. The real trust boundary is that lookup (returns 404 for
+  // anything that doesn't exist) plus createAdminClient() returning null
+  // (503) when Supabase isn't configured — not this field's text format. A
+  // genuine Supabase row's id is always a real UUID regardless (enforced by
+  // the schema itself), so this is strictly more permissive, never less safe.
+  productId: z.string().trim().min(1, "Invalid product.").max(100, "Invalid product."),
+  variationId: z.string().trim().min(1, "Invalid variation.").max(100, "Invalid variation.").nullish(),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1.").max(10, "Quantity cannot exceed 10.").default(1),
   customerName: z.string().trim().min(1, "Name is required.").max(200),
   customerContact: z.string().trim().min(1, "Contact information is required.").max(200),
