@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logSupabaseError } from "@/lib/supabase/logError";
 import type { Order, OrderStatus, PaymentStatus } from "@/lib/types";
 
 /**
@@ -23,14 +24,16 @@ export async function getOrders(options?: { status?: OrderStatus; page?: number;
   if (options?.status) query = query.eq("order_status", options.status);
   query = query.range(start, start + pageSize - 1);
 
-  const { data, count } = await query;
+  const { data, count, error } = await query;
+  logSupabaseError("getOrders", error);
   return { orders: (data as Order[]) ?? [], total: count ?? 0 };
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {
   const supabase = await createClient();
   if (!supabase) return null;
-  const { data } = await supabase.from("orders").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await supabase.from("orders").select("*").eq("id", id).maybeSingle();
+  logSupabaseError("getOrderById", error);
   return (data as Order) ?? null;
 }
 
@@ -48,7 +51,8 @@ export async function getOrderCounts(): Promise<Record<OrderStatus, number>> {
   };
   if (!supabase) return empty;
 
-  const { data } = await supabase.from("orders").select("order_status");
+  const { data, error } = await supabase.from("orders").select("order_status");
+  logSupabaseError("getOrderCounts", error);
   for (const row of (data as { order_status: OrderStatus }[]) ?? []) {
     empty[row.order_status] += 1;
   }
@@ -87,13 +91,14 @@ export async function getPublicOrderStatus(id: string): Promise<PublicOrderStatu
   const admin = createAdminClient();
   if (!admin) return null;
 
-  const { data } = await admin
+  const { data, error } = await admin
     .from("orders")
     .select(
       "id, product_name_snapshot, variation_name_snapshot, price_snapshot, currency, quantity, order_status, payment_status, crypto_payment_status, pay_currency, pay_amount, pay_address, paid_at, created_at"
     )
     .eq("id", id)
     .maybeSingle();
+  logSupabaseError("getPublicOrderStatus", error);
   if (!data) return null;
 
   return {

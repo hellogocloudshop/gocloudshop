@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logSupabaseError } from "@/lib/supabase/logError";
 import { mockProviderCategoryPages, mockProviders, mockCategories } from "@/lib/mock-data";
 import type { ProviderCategoryPage } from "@/lib/types";
 
@@ -19,11 +20,12 @@ export async function getProviderCategoryPages(): Promise<ProviderCategoryPage[]
       .sort((a, b) => a.sort_order - b.sort_order);
   }
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("provider_category_pages")
     .select("*, provider:providers(*), category:categories(*)")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
+  logSupabaseError("getProviderCategoryPages", error);
   return (data as ProviderCategoryPage[]) ?? [];
 }
 
@@ -34,11 +36,12 @@ export async function getProviderCategoryPageBySlug(slug: string): Promise<Provi
     return page ? withRelations(page) : null;
   }
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("provider_category_pages")
     .select("*, provider:providers(*), category:categories(*)")
     .eq("slug", slug)
     .maybeSingle();
+  logSupabaseError("getProviderCategoryPageBySlug", error);
   return (data as ProviderCategoryPage) ?? null;
 }
 
@@ -49,10 +52,11 @@ export async function getProviderCategoryPagesByProvider(providerId: string): Pr
       .filter((p) => p.provider_id === providerId && p.is_active)
       .map(withRelations);
   }
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("provider_category_pages")
     .select("*, category:categories(*)")
     .eq("provider_id", providerId)
     .eq("is_active", true);
+  logSupabaseError("getProviderCategoryPagesByProvider", error);
   return (data as ProviderCategoryPage[]) ?? [];
 }

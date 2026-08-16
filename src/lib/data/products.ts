@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logSupabaseError } from "@/lib/supabase/logError";
 import { mockProducts, mockVariations, mockProviders, mockCategories } from "@/lib/mock-data";
 import type { Product, ProductVariation } from "@/lib/types";
 import { effectivePrice } from "@/lib/utils";
@@ -136,11 +137,21 @@ export async function getProducts(
   // through the embedded join (PostgREST only filters parent rows by an
   // embedded column when the embed uses `!inner`, so we resolve IDs first).
   if (filters.categorySlug) {
-    const { data: category } = await supabase.from("categories").select("id").eq("slug", filters.categorySlug).maybeSingle();
+    const { data: category, error: categoryError } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", filters.categorySlug)
+      .maybeSingle();
+    logSupabaseError(`getProducts (category lookup: ${filters.categorySlug})`, categoryError);
     query = query.eq("category_id", category?.id ?? "00000000-0000-0000-0000-000000000000");
   }
   if (filters.providerSlug) {
-    const { data: provider } = await supabase.from("providers").select("id").eq("slug", filters.providerSlug).maybeSingle();
+    const { data: provider, error: providerError } = await supabase
+      .from("providers")
+      .select("id")
+      .eq("slug", filters.providerSlug)
+      .maybeSingle();
+    logSupabaseError(`getProducts (provider lookup: ${filters.providerSlug})`, providerError);
     query = query.eq("provider_id", provider?.id ?? "00000000-0000-0000-0000-000000000000");
   }
   if (filters.productType) query = query.eq("product_type", filters.productType);
@@ -160,7 +171,8 @@ export async function getProducts(
   const start = (page - 1) * pageSize;
   query = query.range(start, start + pageSize - 1);
 
-  const { data, count } = await query;
+  const { data, count, error } = await query;
+  logSupabaseError("getProducts", error);
   return { products: (data as Product[]) ?? [], total: count ?? 0 };
 }
 
@@ -172,11 +184,12 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return product ? attachRelations(product) : null;
   }
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("products")
     .select("*, provider:providers(*), category:categories(*), variations:product_variations(*)")
     .eq("slug", slug)
     .maybeSingle();
+  logSupabaseError("getProductBySlug", error);
   return (data as Product) ?? null;
 }
 
@@ -194,11 +207,12 @@ export async function getProductById(id: string): Promise<Product | null> {
     return product ? attachRelations(product) : null;
   }
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("products")
     .select("*, provider:providers(*), category:categories(*), variations:product_variations(*)")
     .eq("id", id)
     .maybeSingle();
+  logSupabaseError("getProductById", error);
   return (data as Product) ?? null;
 }
 
@@ -235,6 +249,10 @@ export interface ProviderCatalogSummary {
  */
 export async function getProviderCatalogSummary(providerSlug: string): Promise<ProviderCatalogSummary> {
   const { products } = await getProducts({ providerSlug, pageSize: 200 });
+  return summarizeProducts(products);
+}
+
+function summarizeProducts(products: Product[]): ProviderCatalogSummary {
   const prices = products
     .map((p) => effectivePrice(p, p.variations ?? []).price)
     .filter((p): p is number => p !== null);
@@ -245,6 +263,33 @@ export async function getProviderCatalogSummary(providerSlug: string): Promise<P
     startingPrice: prices.length > 0 ? Math.min(...prices) : null,
     categories,
   };
+}
+
+/**
+ * Same per-provider summary as getProviderCatalogSummary(), but for every
+ * active provider at once from a single products query instead of one
+ * query per provider. Used on the homepage's provider grid and the Cloud
+ * Service listing page, which previously called getProviderCatalogSummary()
+ * once per provider in a loop — each call did its own slug->id lookup plus
+ * its own full products query, so a page with N providers issued roughly
+ * 2N sequential Supabase round trips just to render provider cards. This
+ * does it in one.
+ */
+export async function getProviderCatalogSummaries(): Promise<Map<string, ProviderCatalogSummary>> {
+  const { products } = await getProducts({ pageSize: 1000 });
+  const byProvider = new Map<string, Product[]>();
+  for (const product of products) {
+    if (!product.provider_id) continue;
+    const list = byProvider.get(product.provider_id);
+    if (list) list.push(product);
+    else byProvider.set(product.provider_id, [product]);
+  }
+
+  const summaries = new Map<string, ProviderCatalogSummary>();
+  for (const [providerId, providerProducts] of byProvider) {
+    summaries.set(providerId, summarizeProducts(providerProducts));
+  }
+  return summaries;
 }
 
 export type { ProductVariation };

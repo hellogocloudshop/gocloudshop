@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CheckCircle2, DollarSign, LifeBuoy, MousePointerClick } from "lucide-react";
 import { getProviders } from "@/lib/data/providers";
-import { getProviderCatalogSummary } from "@/lib/data/products";
+import { getProviderCatalogSummaries } from "@/lib/data/products";
 import { getSiteSettings } from "@/lib/data/settings";
 import type { ContactChannels } from "@/lib/contact";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -37,11 +37,11 @@ const TRUST_ROW = [
   { icon: MousePointerClick, label: "Easy Ordering" },
 ];
 
+const EMPTY_SUMMARY = { productCount: 0, startingPrice: null, categories: [] as string[] };
+
 export default async function CloudServicePage() {
-  const [providers, settings] = await Promise.all([getProviders(), getSiteSettings()]);
-  const withSummary = await Promise.all(
-    providers.map(async (provider) => ({ provider, summary: await getProviderCatalogSummary(provider.slug) }))
-  );
+  const [providers, settings, summaries] = await Promise.all([getProviders(), getSiteSettings(), getProviderCatalogSummaries()]);
+  const withSummary = providers.map((provider) => ({ provider, summary: summaries.get(provider.id) ?? EMPTY_SUMMARY }));
   const channels: ContactChannels = {
     telegramUsername: settings.telegram_username,
     whatsappNumber: settings.whatsapp_number,

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logSupabaseError } from "@/lib/supabase/logError";
 import { mockComparisons, mockProviders } from "@/lib/mock-data";
 import type { Comparison } from "@/lib/types";
 
@@ -19,11 +20,12 @@ export async function getComparisons(): Promise<Comparison[]> {
       .map(withProviders)
       .sort((a, b) => a.sort_order - b.sort_order);
   }
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("comparisons")
     .select("*")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
+  logSupabaseError("getComparisons", error);
   return (data as Comparison[]) ?? [];
 }
 
@@ -33,6 +35,7 @@ export async function getComparisonBySlug(slug: string): Promise<Comparison | nu
     const comparison = mockComparisons.find((c) => c.slug === slug && c.is_active);
     return comparison ? withProviders(comparison) : null;
   }
-  const { data } = await supabase.from("comparisons").select("*").eq("slug", slug).maybeSingle();
+  const { data, error } = await supabase.from("comparisons").select("*").eq("slug", slug).maybeSingle();
+  logSupabaseError("getComparisonBySlug", error);
   return (data as Comparison) ?? null;
 }

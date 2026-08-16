@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logSupabaseError } from "@/lib/supabase/logError";
 import { mockFaqs } from "@/lib/mock-data";
 import type { Faq } from "@/lib/types";
 
@@ -9,13 +10,14 @@ export async function getGlobalFaqs(): Promise<Faq[]> {
       .filter((f) => f.is_active && !f.product_id && !f.provider_id)
       .sort((a, b) => a.sort_order - b.sort_order);
   }
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("faqs")
     .select("*")
     .eq("is_active", true)
     .is("product_id", null)
     .is("provider_id", null)
     .order("sort_order", { ascending: true });
+  logSupabaseError("getGlobalFaqs", error);
   return (data as Faq[]) ?? [];
 }
 
@@ -24,12 +26,13 @@ export async function getFaqsByProduct(productId: string): Promise<Faq[]> {
   if (!supabase) {
     return mockFaqs.filter((f) => f.is_active && f.product_id === productId).sort((a, b) => a.sort_order - b.sort_order);
   }
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("faqs")
     .select("*")
     .eq("is_active", true)
     .eq("product_id", productId)
     .order("sort_order", { ascending: true });
+  logSupabaseError("getFaqsByProduct", error);
   return (data as Faq[]) ?? [];
 }
 
@@ -38,11 +41,12 @@ export async function getFaqsByProvider(providerId: string): Promise<Faq[]> {
   if (!supabase) {
     return mockFaqs.filter((f) => f.is_active && f.provider_id === providerId).sort((a, b) => a.sort_order - b.sort_order);
   }
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("faqs")
     .select("*")
     .eq("is_active", true)
     .eq("provider_id", providerId)
     .order("sort_order", { ascending: true });
+  logSupabaseError("getFaqsByProvider", error);
   return (data as Faq[]) ?? [];
 }
