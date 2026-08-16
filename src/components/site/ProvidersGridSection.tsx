@@ -1,5 +1,5 @@
-import { getProviders } from "@/lib/data/providers";
-import { getProviderCatalogSummaries } from "@/lib/data/products";
+import type { Provider } from "@/lib/types";
+import type { ProviderCatalogSummary } from "@/lib/data/products";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HOMEPAGE_PROVIDER_COPY } from "@/config/homepageProviderCopy";
 import { ProviderCard } from "./ProviderCard";
@@ -11,9 +11,23 @@ const EMPTY_SUMMARY = { productCount: 0, startingPrice: null, categories: [] as 
  *  and starting price pulled straight from the catalog, and a CTA into that
  *  provider's real account page. Providers without Homepage-specific copy
  *  (e.g. Atlantic.Net) fall back to their real database description, so
- *  every active provider still gets a full, working card. */
-export async function ProvidersGridSection() {
-  const [providers, summaries] = await Promise.all([getProviders(), getProviderCatalogSummaries()]);
+ *  every active provider still gets a full, working card.
+ *
+ *  Purely presentational — takes providers/summaries as props instead of
+ *  fetching its own data. It used to run its own Promise.all() internally,
+ *  which (since it's nested inside the JSX HomePage() returns) could only
+ *  start *after* HomePage's own top-level Promise.all had already
+ *  resolved — an extra sequential round trip on every homepage load. Now
+ *  its data is fetched by HomePage() as part of that same top-level
+ *  Promise.all, so this and every other section's data is one parallel
+ *  batch instead of two sequential ones. */
+export function ProvidersGridSection({
+  providers,
+  summaries,
+}: {
+  providers: Provider[];
+  summaries: Map<string, ProviderCatalogSummary>;
+}) {
   const withSummary = providers.map((provider) => ({
     provider,
     summary: summaries.get(provider.id) ?? EMPTY_SUMMARY,

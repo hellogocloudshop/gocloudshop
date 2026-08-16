@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getProducts, getFeaturedProducts, getAiProducts } from "@/lib/data/products";
+import { getProducts, getFeaturedProducts, getAiProducts, getProviderCatalogSummaries } from "@/lib/data/products";
+import { getProviders } from "@/lib/data/providers";
 import { getUseCases } from "@/lib/data/useCases";
 import { getComparisons } from "@/lib/data/comparisons";
 import { getApprovedReviews } from "@/lib/data/reviews";
@@ -41,6 +42,8 @@ export default async function HomePage() {
     comparisons,
     reviews,
     settings,
+    providers,
+    providerSummaries,
   ] = await Promise.all([
     getProducts({ pageSize: 40 }),
     getFeaturedProducts(8),
@@ -49,6 +52,8 @@ export default async function HomePage() {
     getComparisons(),
     getApprovedReviews({ limit: 6 }),
     getSiteSettings(),
+    getProviders(),
+    getProviderCatalogSummaries(),
   ]);
 
   const heroProduct = featuredProducts[0] ?? marketplaceProducts[0] ?? null;
@@ -67,7 +72,7 @@ export default async function HomePage() {
       <TrustIndicators />
 
       {/* 3. Cloud Account Categories (full provider marketing copy) */}
-      <ProvidersGridSection />
+      <ProvidersGridSection providers={providers} summaries={providerSummaries} />
 
       {/* 4. Why Choose Our Cloud Accounts */}
       <WhyChooseSection />
