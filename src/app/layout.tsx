@@ -43,6 +43,14 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
     },
+    // Google Search Console ownership verification. Set once here at the
+    // root — Next.js merges metadata up the tree, so this renders exactly
+    // one <meta name="google-site-verification"> tag in <head> on every
+    // page; no child route defines this field, so it can never be
+    // overridden or duplicated.
+    verification: {
+      google: "cBUTWjqrY33M87t2VN6WZfwuN_XxKrnbSsWl64yknoM",
+    },
   };
 }
 
