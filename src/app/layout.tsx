@@ -51,6 +51,18 @@ export async function generateMetadata(): Promise<Metadata> {
     verification: {
       google: "cBUTWjqrY33M87t2VN6WZfwuN_XxKrnbSsWl64yknoM",
     },
+    // Favicon/browser-tab icon. Same "set once at the root" reasoning as
+    // above — no src/app/favicon.ico, src/app/icon.*, or other icons
+    // definition exists anywhere else in the project (verified before this
+    // change), so this is the single, authoritative favicon configuration
+    // for every route. References the existing file directly from
+    // public/icons/favicon.png (served at /icons/favicon.png) rather than
+    // moving/duplicating it — Next.js's metadata icons field accepts any
+    // path under /public, it doesn't require the file to be named
+    // "favicon" or live at the public root.
+    icons: {
+      icon: "/icons/favicon.png",
+    },
   };
 }
 
