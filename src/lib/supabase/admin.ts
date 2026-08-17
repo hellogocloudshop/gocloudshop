@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "./env";
+import { fetchWithTimeout } from "./fetchWithTimeout";
 
 /**
  * Privileged service-role client for server-only admin operations (e.g.
@@ -13,5 +14,6 @@ export function createAdminClient() {
 
   return createSupabaseClient(SUPABASE_URL, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false },
+    global: { fetch: fetchWithTimeout("admin-client") },
   });
 }

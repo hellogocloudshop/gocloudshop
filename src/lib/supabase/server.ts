@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "./env";
+import { fetchWithTimeout } from "./fetchWithTimeout";
 
 /**
  * Server-side Supabase client for Server Components / Server Actions / Route Handlers.
@@ -49,5 +50,6 @@ export async function createClient() {
         }
       },
     },
+    global: { fetch: fetchWithTimeout("anon-client") },
   });
 }
