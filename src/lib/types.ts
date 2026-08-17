@@ -254,16 +254,17 @@ export interface Order {
   variation_name_snapshot: string | null;
   price_snapshot: number | null;
   currency: string;
-  /** Units of the same product/variation (see migration 0008). Always 1 for
-   *  the existing Telegram-lead flow; price_snapshot is the total (unit
-   *  price x quantity) for checkout/NOWPayments orders. */
+  /** Units of the same product/variation. Always 1 for the Telegram-lead
+   *  ordering flow. */
   quantity: number;
   order_status: OrderStatus;
   payment_status: PaymentStatus;
   notes: string | null;
   referrer: string | null;
-  /** NOWPayments crypto-payment fields (see migration 0007) — null for the
-   *  existing Telegram-lead flow, which doesn't set a payment_provider. */
+  /** Legacy NOWPayments crypto-payment fields (see migration 0007) — kept
+   *  only so historical orders placed while that integration was active
+   *  still display correctly in the admin Orders view; always null for the
+   *  Telegram-lead ordering flow, which is the only active ordering path. */
   payment_provider: string | null;
   nowpayments_payment_id: string | null;
   nowpayments_order_id: string | null;
@@ -272,8 +273,7 @@ export interface Order {
   pay_address: string | null;
   outcome_amount: number | null;
   outcome_currency: string | null;
-  /** Raw NOWPayments payment_status string — see mapPaymentStatus() in
-   *  lib/nowpayments.ts for how this maps into payment_status above. */
+  /** Raw payment-provider status string for legacy NOWPayments orders. */
   crypto_payment_status: string | null;
   /** Most recent verified IPN payload, for audit/debugging only. */
   ipn_payload: Record<string, unknown> | null;

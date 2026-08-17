@@ -2,7 +2,7 @@ import type { SellableItem } from "@/lib/data/allProducts";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AllProductsCard } from "./AllProductsCard";
 
-export function AllProductsGrid({ items }: { items: SellableItem[] }) {
+export function AllProductsGrid({ items, telegramUsername }: { items: SellableItem[]; telegramUsername: string }) {
   if (items.length === 0) {
     return (
       <EmptyState
@@ -15,7 +15,7 @@ export function AllProductsGrid({ items }: { items: SellableItem[] }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {items.map((item) => (
-        <AllProductsCard key={item.id} item={item} />
+        <AllProductsCard key={item.id} item={item} telegramUsername={telegramUsername} />
       ))}
     </div>
   );

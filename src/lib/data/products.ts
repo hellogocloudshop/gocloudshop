@@ -198,10 +198,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 }
 
 /**
- * Looked up by id (not slug) — used server-side by the NOWPayments
- * create-payment route, which only ever receives a product id from the
- * client and must independently re-derive the real price/currency from the
- * database, never trusting anything the client sends.
+ * Looked up by id (not slug) — for any server-side caller that only has a
+ * product id and must independently re-derive real product data from the
+ * database, never trusting anything a client sends.
  */
 export async function getProductById(id: string): Promise<Product | null> {
   const supabase = await createClient();

@@ -146,7 +146,7 @@ export default async function ProductDetailPage({
           </div>
 
           <div className="mt-6">
-            <VariationSelector product={product} variations={variations} />
+            <VariationSelector product={product} variations={variations} telegramUsername={settings.telegram_username} />
           </div>
 
           <div className="mt-6">

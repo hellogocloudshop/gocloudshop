@@ -81,13 +81,12 @@ Do not report success. Read the actual error and explain it plainly:
 - **Merge conflict** — stop and explain the conflict clearly rather than
   overwriting either side.
 
-## Notes specific to this project's payment integration
+## Notes specific to this project
 
-- NOWPayments secrets are read only in `src/lib/nowpayments.ts` and
-  `src/app/api/payments/nowpayments/ipn/route.ts` (server-only). Any change
-  that touches payment code should re-confirm this stays true before
-  committing.
-- IPN URL is fixed: `https://gocloudshop.com/api/payments/nowpayments/ipn`.
+- Ordering is via "Order via Telegram" buttons (see `TelegramOrderButton.tsx`
+  and `src/lib/telegram.ts`) — every order/lead is captured in the `orders`
+  table (via `createOrder()`, `src/lib/actions/orders.ts`) before the
+  Telegram deep link opens.
 - Database migrations for this project live in `supabase/migrations/*.sql`,
   numbered sequentially — never edit an already-shipped migration, add a new
   one. Migrations are committed to Git but are **not** applied to the live

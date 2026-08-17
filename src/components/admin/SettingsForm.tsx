@@ -41,8 +41,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
       <section className="card-surface space-y-4 p-6">
         <h2 className="font-semibold text-ink">Ordering</h2>
         <p className="text-xs text-ink-muted">
-          This Telegram username is used for direct support/order inquiries (e.g. Stock Updates and the Contact page) — the main product
-          checkout flow is now handled online via NOWPayments.
+          This is the single source of truth for every &quot;Order via Telegram&quot; button on the site.
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Telegram Username" name="telegram_username" defaultValue={settings.telegram_username} required placeholder="GoCloudShopSupport" />

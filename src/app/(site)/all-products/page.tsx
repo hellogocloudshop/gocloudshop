@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getAllSellableItems } from "@/lib/data/allProducts";
 import type { SortOption } from "@/lib/data/products";
 import { getProviders } from "@/lib/data/providers";
+import { getSiteSettings } from "@/lib/data/settings";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProductFilters as CatalogFilters } from "@/components/site/ProductFilters";
@@ -37,8 +38,9 @@ export default async function AllProductsPage({
   const sortParam = get("sort");
   const sort: SortOption = VALID_SORTS.includes(sortParam as SortOption) ? (sortParam as SortOption) : "recommended";
 
-  const [providers, { items, total }] = await Promise.all([
+  const [providers, settings, { items, total }] = await Promise.all([
     getProviders(),
+    getSiteSettings(),
     getAllSellableItems({
       search: get("q"),
       providerSlug: get("provider"),
@@ -86,7 +88,7 @@ export default async function AllProductsPage({
           <p className="mb-4 text-sm text-ink-muted">
             {total} {total === 1 ? "product" : "products"} found
           </p>
-          <AllProductsGrid items={items} />
+          <AllProductsGrid items={items} telegramUsername={settings.telegram_username} />
           <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
         </div>
       </div>

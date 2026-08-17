@@ -3,7 +3,7 @@ import type { SellableItem } from "@/lib/data/allProducts";
 import { cn, formatPrice } from "@/lib/utils";
 import { AvailabilityBadge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { BuyNowButton } from "./BuyNowButton";
+import { TelegramOrderButton } from "./TelegramOrderButton";
 
 /** Real spec text only — features first, falling back to specifications
  *  key/value pairs. Never fabricated; returns null when neither exists. */
@@ -19,18 +19,20 @@ function configurationLine(item: SellableItem): string | null {
  * ONE unified catalog section for a provider's account page — every
  * purchasable variation/account tier as a compact row inside a single
  * bordered container, separated by dividers, rather than a grid of
- * individual cards. Each row's Buy Now button takes the customer to the
- * same /checkout flow used everywhere else in the app.
+ * individual cards. Each row's Order button opens the same "Order via
+ * Telegram" flow used everywhere else in the app.
  */
 export function ProviderProductCatalog({
   items,
   title,
   emptyDescription,
+  telegramUsername,
   tone = "light",
 }: {
   items: SellableItem[];
   title: string;
   emptyDescription: string;
+  telegramUsername: string;
   tone?: "light" | "dark";
 }) {
   const dark = tone === "dark";
@@ -93,10 +95,15 @@ export function ProviderProductCatalog({
 
                   <div className="sm:w-32 sm:text-right">
                     {item.price !== null && item.availability !== "out_of_stock" ? (
-                      <BuyNowButton
+                      <TelegramOrderButton
+                        telegramUsername={telegramUsername}
                         productId={item.product.id}
+                        productName={item.displayName}
                         variationId={item.variation?.id}
-                        label="Buy Now"
+                        variationName={item.variation?.name}
+                        price={item.price}
+                        currency={item.currency}
+                        label="Order"
                         className="w-full justify-center !px-4 !py-2 text-sm sm:w-auto"
                       />
                     ) : (

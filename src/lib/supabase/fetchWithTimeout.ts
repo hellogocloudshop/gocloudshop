@@ -4,12 +4,10 @@ const DEFAULT_TIMEOUT_MS = 10_000;
 
 /**
  * Wraps global fetch with a hard timeout, passed to the Supabase client via
- * its `global.fetch` option. Every other Supabase-backed request in this
- * codebase already has an explicit timeout (see src/lib/nowpayments.ts's
- * 15s AbortController) — the Supabase catalog client did not, which meant a
- * slow/unreachable network path could leave a request hanging for however
- * long Node's own default socket behavior allows, well past what any page
- * load should tolerate, instead of failing fast with a clear error.
+ * its `global.fetch` option, so a slow/unreachable network path fails fast
+ * with a clear error instead of leaving a request hanging for however long
+ * Node's own default socket behavior allows — well past what any page load
+ * should tolerate.
  *
  * With this in place, a genuinely slow or unreachable Supabase connection
  * now fails after 10s with a normal AbortError, which @supabase/postgrest-js

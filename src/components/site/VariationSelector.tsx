@@ -1,14 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { Check, MapPin, Search, Truck } from "lucide-react";
 import type { Product, ProductVariation } from "@/lib/types";
 import { cn, formatPrice } from "@/lib/utils";
 import { AvailabilityBadge, ProductBadge } from "@/components/ui/Badge";
 import { SpecificationTable } from "./SpecificationTable";
 import { AIProductSpecs } from "./AIProductSpecs";
-import { BuyNowButton } from "./BuyNowButton";
+import { TelegramOrderButton } from "./TelegramOrderButton";
 
 const SEARCHABLE_THRESHOLD = 7;
 
@@ -21,9 +20,11 @@ const SEARCHABLE_THRESHOLD = 7;
 export function VariationSelector({
   product,
   variations,
+  telegramUsername,
 }: {
   product: Product;
   variations: ProductVariation[];
+  telegramUsername: string;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(variations[0]?.id ?? null);
   const [query, setQuery] = useState("");
@@ -153,13 +154,18 @@ export function VariationSelector({
           )}
         </div>
 
-        {price !== null && availability !== "out_of_stock" ? (
-          <BuyNowButton productId={product.id} variationId={selected?.id} className="mt-5 w-full justify-center" />
-        ) : (
-          <Link href="/contact" className="btn-secondary mt-5 w-full justify-center">
-            {availability === "out_of_stock" ? "Out of Stock — Contact Us" : "Contact Us to Order"}
-          </Link>
-        )}
+        <div className="mt-5">
+          <TelegramOrderButton
+            telegramUsername={telegramUsername}
+            productId={product.id}
+            productName={product.name}
+            variationId={selected?.id}
+            variationName={selected?.name}
+            price={price}
+            currency={currency}
+            className="w-full justify-center"
+          />
+        </div>
       </div>
 
       {features.length > 0 && (

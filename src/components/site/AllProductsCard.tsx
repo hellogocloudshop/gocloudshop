@@ -4,18 +4,17 @@ import type { SellableItem } from "@/lib/data/allProducts";
 import { cn, formatPrice, productHref } from "@/lib/utils";
 import { ProductBadge, AvailabilityBadge } from "@/components/ui/Badge";
 import { ProviderLogo } from "@/components/ui/SmartImage";
-import { BuyNowButton } from "./BuyNowButton";
+import { TelegramOrderButton } from "./TelegramOrderButton";
 
 /**
  * One card per purchasable variation (or per standalone product with no
  * variations) — the /all-products catalog card. Visually modeled on
  * ProductCard (same design tokens/spacing/shadows) but the primary CTA is a
- * direct "Buy" action instead of a "View Details" navigation link; the
- * product title still links to the detail page as a secondary, accessible
- * route (spec: primary visible CTA must be Buy, a details link may remain
- * internally accessible).
+ * direct "Order via Telegram" action instead of a "View Details" navigation
+ * link; the product title still links to the detail page as a secondary,
+ * accessible route.
  */
-export function AllProductsCard({ item }: { item: SellableItem }) {
+export function AllProductsCard({ item, telegramUsername }: { item: SellableItem; telegramUsername: string }) {
   const { product, variation, displayName, price, currency, availability, badge, features } = item;
   const detailsHref = productHref(product);
   const isBuyable = price !== null && availability !== "out_of_stock";
@@ -61,7 +60,17 @@ export function AllProductsCard({ item }: { item: SellableItem }) {
           <AvailabilityBadge status={availability} />
         </div>
         {isBuyable ? (
-          <BuyNowButton productId={product.id} variationId={variation?.id} label="Buy" className="!px-4 !py-2 shrink-0" />
+          <TelegramOrderButton
+            telegramUsername={telegramUsername}
+            productId={product.id}
+            productName={displayName}
+            variationId={variation?.id}
+            variationName={variation?.name}
+            price={price}
+            currency={currency}
+            label="Order"
+            className="!px-4 !py-2 shrink-0"
+          />
         ) : (
           <Link href="/contact" className={cn("btn-secondary shrink-0", "!px-4 !py-2")}>
             Contact

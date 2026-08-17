@@ -90,6 +90,7 @@ export async function ProviderDetailView({ provider }: { provider: Provider }) {
       items={items}
       title={`Available ${displayName} Accounts`}
       emptyDescription={`${provider.name} has no active products right now — check back soon.`}
+      telegramUsername={settings.telegram_username}
       tone={landing ? "dark" : "light"}
     />
   );
