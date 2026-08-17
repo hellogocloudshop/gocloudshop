@@ -54,9 +54,9 @@ export function AllProductsCard({ item, telegramUsername }: { item: SellableItem
         </ul>
       )}
 
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">
-        <div>
-          <p className="text-lg font-bold text-ink">{price !== null ? formatPrice(price, currency) : "Contact us"}</p>
+      <div className="mt-4 flex items-end justify-between gap-3 border-t border-line pt-4">
+        <div className="flex flex-col gap-1.5">
+          <p className="text-lg font-bold leading-none text-ink">{price !== null ? formatPrice(price, currency) : "Contact us"}</p>
           <AvailabilityBadge status={availability} />
         </div>
         {isBuyable ? (

@@ -64,9 +64,9 @@ export function ProductCard({ product, tone = "light" }: { product: Product; ton
         </ul>
       )}
 
-      <div className={cn("mt-4 flex items-center justify-between gap-2 border-t pt-4", dark ? "border-white/10" : "border-line")}>
-        <div>
-          <p className={cn("text-lg font-bold", dark ? "text-white" : "text-ink")}>
+      <div className={cn("mt-4 flex items-end justify-between gap-2 border-t pt-4", dark ? "border-white/10" : "border-line")}>
+        <div className="flex flex-col gap-1.5">
+          <p className={cn("text-lg font-bold leading-none", dark ? "text-white" : "text-ink")}>
             {fromVariation && (
               <span className={cn("mr-1 text-xs font-normal", dark ? "text-white/50" : "text-ink-muted")}>From</span>
             )}
@@ -74,7 +74,14 @@ export function ProductCard({ product, tone = "light" }: { product: Product; ton
           </p>
           <AvailabilityBadge status={product.availability} />
         </div>
-        <span className="flex items-center gap-1 text-sm font-semibold text-accent-blue">
+        <span
+          className={cn(
+            "flex shrink-0 items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-200",
+            dark
+              ? "border-white/15 text-white/80 group-hover:border-accent-blue/50 group-hover:text-white"
+              : "border-line text-ink group-hover:border-accent-blue/40 group-hover:bg-accent-blue/5"
+          )}
+        >
           View Details <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </span>
       </div>
